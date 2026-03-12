@@ -17,9 +17,7 @@ type Config struct {
 const defaultDatabaseURL = "cs2bot.db"
 
 func Load() (*Config, error) {
-	if err := godotenv.Load(); err != nil {
-		return nil, fmt.Errorf("failed to load .env file: %w", err)
-	}
+	_ = godotenv.Load()
 
 	token := os.Getenv("DISCORD_TOKEN")
 	channelID := os.Getenv("CHANNEL_ID")
