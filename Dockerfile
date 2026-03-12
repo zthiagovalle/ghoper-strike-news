@@ -29,6 +29,4 @@ USER appuser
 
 ENV DATABASE_URL=/data/cs2bot.db
 
-VOLUME ["/data"]
-
 ENTRYPOINT ["/app/ghoper-strike-news"]
