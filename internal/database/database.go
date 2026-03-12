@@ -10,8 +10,10 @@ import (
 const createTableSQL = `
 CREATE TABLE IF NOT EXISTS notifications (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
-	link TEXT UNIQUE NOT NULL,
-	created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	link TEXT NOT NULL,
+	channel_id TEXT NOT NULL,
+	created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+	UNIQUE(link, channel_id)
 );
 `
 
@@ -41,16 +43,19 @@ func (r *Repository) Close() error {
 	return r.db.Close()
 }
 
-func (r *Repository) Exists(link string) (bool, error) {
+func (r *Repository) Exists(link, channelID string) (bool, error) {
 	var exists bool
 	err := r.db.QueryRow(
-		"SELECT EXISTS(SELECT 1 FROM notifications WHERE link = ?)",
-		link,
+		"SELECT EXISTS(SELECT 1 FROM notifications WHERE link = ? AND channel_id = ?)",
+		link, channelID,
 	).Scan(&exists)
 	return exists, err
 }
 
-func (r *Repository) Save(link string) error {
-	_, err := r.db.Exec("INSERT INTO notifications (link) VALUES (?)", link)
+func (r *Repository) Save(link, channelID string) error {
+	_, err := r.db.Exec(
+		"INSERT INTO notifications (link, channel_id) VALUES (?, ?)",
+		link, channelID,
+	)
 	return err
 }

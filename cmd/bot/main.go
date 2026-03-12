@@ -23,10 +23,11 @@ const (
 )
 
 type Bot struct {
-	repo     *database.Repository
-	parser   *feed.RSSParser
-	notifier *discord.Notifier
-	analyzer *ai.Analyzer
+	repo      *database.Repository
+	parser    *feed.RSSParser
+	notifier  *discord.Notifier
+	analyzer  *ai.Analyzer
+	channelID string
 }
 
 func NewBot(cfg *config.Config) (*Bot, error) {
@@ -50,10 +51,11 @@ func NewBot(cfg *config.Config) (*Bot, error) {
 	}
 
 	return &Bot{
-		repo:     repo,
-		parser:   feed.NewParser(rssFeedURL),
-		notifier: notifier,
-		analyzer: analyzer,
+		repo:      repo,
+		parser:    feed.NewParser(rssFeedURL),
+		notifier:  notifier,
+		analyzer:  analyzer,
+		channelID: cfg.ChannelID,
 	}, nil
 }
 
@@ -75,7 +77,7 @@ func (b *Bot) checkFeed() {
 	for i := len(items) - 1; i >= 0; i-- {
 		item := items[i]
 
-		exists, err := b.repo.Exists(item.Link)
+		exists, err := b.repo.Exists(item.Link, b.channelID)
 		if err != nil {
 			log.Printf("Failed to check notification: %v", err)
 			continue
@@ -110,7 +112,7 @@ func (b *Bot) checkFeed() {
 			}
 		}
 
-		if err := b.repo.Save(item.Link); err != nil {
+		if err := b.repo.Save(item.Link, b.channelID); err != nil {
 			log.Printf("Failed to save notification: %v", err)
 			continue
 		}

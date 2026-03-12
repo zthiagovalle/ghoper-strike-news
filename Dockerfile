@@ -23,9 +23,7 @@ WORKDIR /app
 
 COPY --from=builder /build/ghoper-strike-news /app/ghoper-strike-news
 
-RUN mkdir -p /data && chown -R appuser:appuser /data /app
-
-USER appuser
+RUN mkdir -p /data
 
 ENV DATABASE_URL=/data/cs2bot.db
 
